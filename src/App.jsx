@@ -1,13 +1,48 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
+
+const letters = "abcdefghijklmnopqrstuvwxyz";
+const numbers = "0123456789";
+const symbols = "!@#$%^&*()-_=+[]{}|;:'\\,.<>?/`~";
 
 function App() {
   const [fullName, setFullName] = useState("Angelo Lepore");
   const [username, setUsername] = useState("angelo_lepore");
-  const [password, setPassword] = useState("password");
+  const [password, setPassword] = useState("Password.94");
   const [specialization, setSpecialization] = useState("Frontend");
   const [experienceYears, setExperienceYears] = useState("1");
   const [description, setDescription] = useState("Speriamo bene!");
 
+  // Username
+  const isUsernameValid = useMemo(() => {
+    const charsValid = username
+      .split("")
+      .every(
+        (char) =>
+          letters.includes(char.toLowerCase()) ||
+          numbers.includes(char) ||
+          char === "_"
+      );
+    return charsValid && username.trim().length >= 6;
+  }, [username]);
+
+  // Password
+  const isPasswordValid = useMemo(() => {
+    return (
+      password.trim().length >= 8 &&
+      password.split("").some((char) => letters.includes(char.toLowerCase())) &&
+      password.split("").some((char) => numbers.includes(char)) &&
+      password.split("").some((char) => symbols.includes(char))
+    );
+  }, [password]);
+
+  // Description
+  const isDescriptionValid = useMemo(() => {
+    const trimmed = description.trim();
+    const noSpacesOutside = description === trimmed;
+    return noSpacesOutside && trimmed.length >= 10 && trimmed.length <= 100;
+  }, [description]);
+
+  // Handle submit
   const handleSubmit = (e) => {
     e.preventDefault();
     if (
@@ -17,7 +52,10 @@ function App() {
       !specialization.trim() ||
       !experienceYears.trim() ||
       experienceYears <= 0 ||
-      !description.trim()
+      !description.trim() ||
+      !isUsernameValid ||
+      !isPasswordValid ||
+      !isDescriptionValid
     ) {
       alert("❌ Errore: Compilare tutti i campi correttamente!");
       return;
@@ -54,6 +92,13 @@ function App() {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           ></input>
+          {username.trim() && (
+            <p style={{ color: isUsernameValid ? "green" : "red" }}>
+              {isUsernameValid
+                ? "Username valido"
+                : "Username non valido - Deve contenere solo caratteri alfanumerici e almeno 6 caratteri"}
+            </p>
+          )}
         </label>
         {/* Password */}
         <label>
@@ -63,6 +108,14 @@ function App() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           ></input>
+
+          {password.trim() && (
+            <p style={{ color: isPasswordValid ? "green" : "red" }}>
+              {isPasswordValid
+                ? "Password valida"
+                : "Password non valida - Deve contenere almeno 8 caratteri, 1 lettera, 1 numero e 1 simbolo"}
+            </p>
+          )}
         </label>
         {/* Specializzazione */}
         <label>
@@ -95,6 +148,13 @@ function App() {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           ></textarea>
+          {description.trim() && (
+            <p style={{ color: isDescriptionValid ? "green" : "red" }}>
+              {isDescriptionValid
+                ? "Descrizione valida"
+                : `Descrizione non valida - Deve contenere tra 10 e 100 caratteri senza spazi iniziali e finali (${description.length})`}
+            </p>
+          )}
         </label>
         {/* Submit button */}
         <button type="submit">Registrati</button>
