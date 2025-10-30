@@ -1,4 +1,4 @@
-import { useMemo, useState, useRef } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 
 const letters = "abcdefghijklmnopqrstuvwxyz";
 const numbers = "0123456789";
@@ -79,10 +79,33 @@ function App() {
     alert("✅ Registrazione completata!");
   };
 
+  // Focus
+  useEffect(() => {
+    fullNameRef.current.focus();
+  }, []);
+
+  // Reset button
+  const resetForm = (e) => {
+    e.preventDefault();
+    fullNameRef.current.value = "";
+    setUsername("");
+    setPassword("");
+    specializationRef.current.value = "";
+    experienceYearsRef.current.value = "";
+    setDescription("");
+    fullNameRef.current.focus();
+  };
+
+  // Scroll to top button
+  const formRef = useRef();
+  const scrollToTop = () => {
+    formRef.current && formRef.current.scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
     <>
       <h1>Web Developer Signup</h1>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} ref={formRef}>
         {/* Nome completo */}
         <label>
           <p>Nome completo</p>
@@ -155,7 +178,13 @@ function App() {
         </label>
         {/* Submit button */}
         <button type="submit">Registrati</button>
+        {/* Reset button */}
+        <button onClick={resetForm}>Reset</button>
       </form>
+      {/* Scroll to top button */}
+      <button className="scroll-top" onClick={scrollToTop}>
+        ↑
+      </button>
     </>
   );
 }
